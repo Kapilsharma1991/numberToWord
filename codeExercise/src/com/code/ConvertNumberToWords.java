@@ -57,16 +57,9 @@ public class ConvertNumberToWords {
                 //convert last 3 digits into words i.e from 1-999
                 if (orderAmountRoundOff % 1000 != 0) {
                     String threeDigitString = convertBelowThousand(orderAmountRoundOff % 1000);
-                    if (place > 0) {
-                        threeDigitString = threeDigitString + " " + BIGDIGITS[place];
-                    }
                     if (numberToWord == null) {
                         numberToWord = threeDigitString;
                     }
-                    else {
-                        numberToWord = threeDigitString + " " + numberToWord;
-                    }
-
                 }
                 flag = false;
                 orderAmountRoundOff /= 1000;
