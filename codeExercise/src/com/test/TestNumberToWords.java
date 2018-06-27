@@ -10,15 +10,17 @@ import static org.junit.Assert.assertEquals;
 * */
 
 public class TestNumberToWords {
+    public static final String INDIAN_FORMAT = "99,99,99,999";
     @Test
     public static void main (String args[]) {
+
         ConvertNumberToWords convertNumberToWords = new ConvertNumberToWords();
-        assertEquals("2523 should converted to two thousand five hundred twenty three", "two thousand five hundred twenty three", convertNumberToWords.convertNumberToWordsWithoutIf(2523));
-        assertEquals("2522.4 should converted to two thousand five hundred twenty two", "two thousand five hundred twenty two", convertNumberToWords.convertNumberToWordsWithoutIf(2522.4));
-        assertEquals("2522.7 should converted to two thousand five hundred twenty three", "two thousand five hundred twenty three", convertNumberToWords.convertNumberToWordsWithoutIf(2522.7));
-        assertEquals("-123 should return not positive", "not positive", convertNumberToWords.convertNumberToWordsWithoutIf(-123));
-        assertEquals("999999999 should not be converted", "long digit", convertNumberToWords.convertNumberToWordsWithoutIf(999999999));
-        assertEquals("0.01 should converted to zero", "zero", convertNumberToWords.convertNumberToWordsWithoutIf(0.01));
+        assertEquals("2523 should converted to two thousand five hundred twenty three", "two thousand five hundred twenty three", convertNumberToWords.convertNumberToWords(2523,INDIAN_FORMAT));
+        assertEquals("2522.4 should converted to two thousand five hundred twenty two", "two thousand five hundred twenty two", convertNumberToWords.convertNumberToWords(2522.4, INDIAN_FORMAT));
+        assertEquals("2522.7 should converted to two thousand five hundred twenty three", "two thousand five hundred twenty three", convertNumberToWords.convertNumberToWords(2522.7, INDIAN_FORMAT));
+        assertEquals("-123 should return not positive", "not positive", convertNumberToWords.convertNumberToWords(-123, INDIAN_FORMAT));
+        assertEquals("999999999 should not be converted", "long digit", convertNumberToWords.convertNumberToWords(999999999, INDIAN_FORMAT));
+        assertEquals("0.01 should converted to zero", "zero", convertNumberToWords.convertNumberToWords(0.01, INDIAN_FORMAT));
         System.out.println("test cases successful");
     }
 }

@@ -1,5 +1,9 @@
 package com.code;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /*
 * This class is used to convert to positive integers or rounded to nearest integers into words and will able to convert till 10 crores
 * */
@@ -10,34 +14,7 @@ public class ConvertNumberToWords {
 
     private static final String[] BIGDIGITS = {"hundred", "thousand", "lakh", "crore"};
 
-    public String convertNumberToWords(double n) {
-        if (n <0) {
-            return "not positive";
-        }
-        if (n >= 999999999) {
-            return "long digit";
-        }
-        int orderAmountRoundOff = (int)Math.round(n);
-        if (orderAmountRoundOff < 20) {
-            return ONEDIGITS[orderAmountRoundOff];
-        }
-        if (orderAmountRoundOff < 100) {
-            return TENDIGITS[orderAmountRoundOff/10] + ((orderAmountRoundOff % 10 > 0) ? " " + convertNumberToWordsWithoutIf(orderAmountRoundOff % 10) : "");
-        }
-        if (orderAmountRoundOff < 1000) {
-            return ONEDIGITS[orderAmountRoundOff / 100] + " " + BIGDIGITS[0] + ((orderAmountRoundOff % 100 > 0) ? " " + convertNumberToWordsWithoutIf(orderAmountRoundOff % 100) : "");
-        }
-        if (orderAmountRoundOff < 100000) {
-            return convertNumberToWordsWithoutIf(orderAmountRoundOff / 1000) + " " + BIGDIGITS[1] + ((orderAmountRoundOff % 1000 > 0) ? " " + convertNumberToWordsWithoutIf(orderAmountRoundOff % 1000) : "");
-        }
-        if (orderAmountRoundOff < 10000000) {
-            return convertNumberToWordsWithoutIf(orderAmountRoundOff / 100000) + " " + BIGDIGITS[2] +  ((orderAmountRoundOff % 100000 > 0) ? " " + convertNumberToWordsWithoutIf(orderAmountRoundOff % 100000) : "");
-        }
-        return convertNumberToWordsWithoutIf(orderAmountRoundOff/10000000) + " " + BIGDIGITS[3] +  ((orderAmountRoundOff % 10000000 > 0) ? " " + convertNumberToWordsWithoutIf(orderAmountRoundOff % 10000000) : "");
-
-    }
-
-    public String convertNumberToWordsWithoutIf(double orderAmount) {
+    public String convertNumberToWords(double orderAmount, String formatType) {
         if (orderAmount <0) {
             return "not positive";
         }
@@ -51,67 +28,61 @@ public class ConvertNumberToWords {
         }
         String numberToWord = null;
         int place = 0;
-        boolean flag = true;
+        List<String> numberFormatAsList = Arrays.asList(formatType.split(","));
+        Collections.reverse(numberFormatAsList);
         while (orderAmountRoundOff > 0) {
-            if(flag){
-                //convert last 3 digits into words i.e from 1-999
-                if (orderAmountRoundOff % 1000 != 0) {
-                    String threeDigitString = convertBelowThousand(orderAmountRoundOff % 1000);
-                    if (numberToWord == null) {
-                        numberToWord = threeDigitString;
-                    }
+            int powerOfTen =  numberFormatAsList.get(place).length();
+            int orderOfTen = (int) Math.pow(10, powerOfTen);
+            if (orderAmountRoundOff % orderOfTen != 0) {
+                String textForOrderOfTen = convertToText(orderAmountRoundOff % orderOfTen, powerOfTen);
+                if (place > 0) {
+                    textForOrderOfTen = textForOrderOfTen + " " + BIGDIGITS[place];
                 }
-                flag = false;
-                orderAmountRoundOff /= 1000;
-                place++;
-            }
-            //as in Indian nomenclature, after 3rd digit, every 2 digit has hundredth significance like thousand will come at 4th digit then lakh will come at 6th digit and crore will come at 8th digit
-            // convert next 2 digit into words with placing bigWords like Thousand, Lakh, Crore according to place variable.
-            if (!flag){
-                if (orderAmountRoundOff % 100 != 0) {
-                    String nextTwoDigits = convertBelowHundred(orderAmountRoundOff % 100);
-                    if (place > 0) {
-                        nextTwoDigits = nextTwoDigits + " " + BIGDIGITS[place];
-                    }
-                    if (numberToWord == null) {
-                        numberToWord = nextTwoDigits;
-                    }
-                    else {
-                        numberToWord = nextTwoDigits + " " + numberToWord;
-                    }
+                if (numberToWord == null) {
+                    numberToWord = textForOrderOfTen;
                 }
-                orderAmountRoundOff /= 100;
-                place++;
+                else {
+                    numberToWord = textForOrderOfTen + " " + numberToWord;
+                }
             }
+            orderAmountRoundOff /= orderOfTen;
+            place++;
         }
         return numberToWord;
     }
 
-    // Range 0 to 999.
-    private String convertBelowThousand (int number) {
-        String oneDigitString = ONEDIGITS[number/100] + " hundred";
-        String hundredDigitString = convertBelowHundred(number % 100);
-        if (number <= 99) {
-            return hundredDigitString; }
-        else if (number % 100 == 0) {
-            return oneDigitString;
-        }
-        else {
-            return oneDigitString + " " + hundredDigitString;
+
+    private String convertToText (int number, int power) {
+        if(power==3){
+            return convertBelowThousand(number);
+        }else {
+            return convertBelowHundred(number);
         }
     }
 
-    //Range 0 to 99
+    private String convertBelowThousand (int number) {
+        String thousandDigitString = ONEDIGITS[number/100] + " hundred";
+        String hundredDigitString = convertBelowHundred(number % 100);
+        if (number <= 99) {
+            return hundredDigitString;
+        }
+        else if (number % 100 == 0) {
+            return thousandDigitString;
+        }
+        else {
+            return thousandDigitString + " " + hundredDigitString;
+        }
+    }
+
     private String convertBelowHundred (int number) {
-        //returning one digit words.
         if (number < 20) {
             return ONEDIGITS[number];
         }
-        // if greater than or equal to 20 then have to divide number by 10 and convert it into words with TEN Digits word constant and one digit word constant.
         String tenString = TENDIGITS[number/10];
         if (number % 10 == 0) {
             return tenString;
         }
         return tenString + " " + ONEDIGITS[number % 10];
     }
+
 }
